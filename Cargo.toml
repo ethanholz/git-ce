@@ -6,3 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+dialoguer = { version = "0.10.4", features = ["fuzzy-select"] }
+git2 = "0.17.2"

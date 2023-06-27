@@ -43,10 +43,11 @@ fn main() {
         .interact()
         .unwrap();
 
-    let built: String = format!(
-        "{}{}: {}\n\n\nBREAKING CHANGE:{}",
-        selections[commit_types], breaking_item, msg, breaking
-    );
+    let mut built: String = format!("{}{}: {}", selections[commit_types], breaking_item, msg);
+    if !breaking.is_empty() {
+        built.push_str(&format!("\n\nBREAKING CHANGE: {}", breaking));
+    }
+
     if let Some(rv) = Editor::new().edit(&built).unwrap() {
         make_commit(&rv).unwrap();
     } else {

@@ -30,14 +30,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "commit-engine"
-version = "0.1.0"
-dependencies = [
- "dialoguer",
- "git2",
-]
-
-[[package]]
 name = "console"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -115,6 +107,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54614a3312934d066701a80f20f15fa3b56d67ac7722b39eea5b4c9dd1d66c94"
 dependencies = [
  "thread_local",
+]
+
+[[package]]
+name = "git-ce"
+version = "0.1.0"
+dependencies = [
+ "dialoguer",
+ "git2",
 ]
 
 [[package]]

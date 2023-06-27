@@ -20,10 +20,12 @@
         };
 
         craneLib = crane.lib.${system};
-        commit-enginer = craneLib.buildPackage {
+        git-ce = craneLib.buildPackage {
           src = craneLib.cleanCargoSource (craneLib.path ./.);
 
           buildInputs = [
+            pkgs.openssl
+            pkgs.pkgconfig
             # Add additional build inputs here
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             # Additional darwin specific inputs can be set here
@@ -36,13 +38,13 @@
       in
       {
         checks = {
-          inherit commit-enginer;
+          inherit git-ce;
         };
 
-        packages.default = commit-enginer;
+        packages.default = git-ce;
 
         apps.default = flake-utils.lib.mkApp {
-          drv = commit-enginer;
+          drv = git-ce;
         };
 
         devShells.default = pkgs.mkShell {

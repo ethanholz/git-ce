@@ -1,5 +1,5 @@
 [package]
-name = "commit-engine"
+name = "git-ce"
 version = "0.1.0"
 edition = "2021"
 

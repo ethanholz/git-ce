@@ -20,7 +20,7 @@
         };
 
         craneLib = crane.lib.${system};
-        my-crate = craneLib.buildPackage {
+        commit-enginer = craneLib.buildPackage {
           src = craneLib.cleanCargoSource (craneLib.path ./.);
 
           buildInputs = [
@@ -36,13 +36,13 @@
       in
       {
         checks = {
-          inherit my-crate;
+          inherit commit-enginer;
         };
 
-        packages.default = my-crate;
+        packages.default = commit-enginer;
 
         apps.default = flake-utils.lib.mkApp {
-          drv = my-crate;
+          drv = commit-enginer;
         };
 
         devShells.default = pkgs.mkShell {
@@ -55,6 +55,9 @@
           nativeBuildInputs = with pkgs; [
             cargo
             rustc
+            rust-analyzer
+            pkg-config
+            openssl
           ];
         };
       });

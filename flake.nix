@@ -1,5 +1,5 @@
 {
-  description = "Build a cargo project without extra checks";
+  description = "A flake for git-ce";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

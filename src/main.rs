@@ -1,10 +1,22 @@
 use dialoguer::{Editor, FuzzySelect, Input};
-use git2::Repository;
+use git2::{Repository, StatusOptions};
 
 fn main() {
     if Repository::open(".").is_err() {
-        panic!("not a git repo");
+        println!("Not a git repo!");
+        return;
     }
+
+    match has_staged_changes() {
+        Ok(val) => {
+            if !val {
+                println!("No staged changes!");
+                return;
+            }
+        }
+        Err(err) => panic!("Error: {}", err),
+    }
+
     let mut breaking_item = "";
     let selections = &[
         "feat", "fix", "chore", "ci", "docs", "style", "refactor", "perf", "test",
@@ -28,12 +40,29 @@ fn main() {
 
     let built: String = format!("{}{}: commit\n", selections[commit_types], breaking_item);
     if let Some(rv) = Editor::new().edit(&built).unwrap() {
-        println!("Your message: {}", rv);
+        make_commit(&rv).unwrap();
     } else {
         println!("No message entered");
     }
+}
 
-    make_commit(&built).unwrap();
+fn has_staged_changes() -> Result<bool, git2::Error> {
+    let repo = Repository::open(".")?;
+    let mut opts = StatusOptions::new();
+    opts.include_untracked(false)
+        .renames_head_to_index(true)
+        .include_ignored(false);
+
+    let statuses = repo.statuses(Some(&mut opts))?;
+    for _entry in statuses.iter().filter(|e| {
+        e.status().is_index_new()
+            || e.status().is_index_modified()
+            || e.status().is_index_renamed()
+            || e.status().is_index_typechange()
+    }) {
+        return Ok(true);
+    }
+    Ok(false)
 }
 
 fn make_commit(message: &str) -> Result<(), git2::Error> {

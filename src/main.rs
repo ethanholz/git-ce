@@ -38,7 +38,15 @@ fn main() {
         breaking_item = "!";
     }
 
-    let built: String = format!("{}{}: commit\n", selections[commit_types], breaking_item);
+    let msg: String = Input::new()
+        .with_prompt("Commit message")
+        .interact()
+        .unwrap();
+
+    let built: String = format!(
+        "{}{}: {}\n\n\nBREAKING CHANGE:{}",
+        selections[commit_types], breaking_item, msg, breaking
+    );
     if let Some(rv) = Editor::new().edit(&built).unwrap() {
         make_commit(&rv).unwrap();
     } else {

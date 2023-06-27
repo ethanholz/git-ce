@@ -63,4 +63,8 @@
           ];
         };
       });
+  nixConfig = {
+    extra-substituters = [ "https://git-ce.cachix.org" ];
+    extra-trusted-public-keys = [ "git-ce.cachix.org-1:U+Gm5iuIbU4Q/RKIlK1eCB5HPXH5eqDTlp4tbOjG30M=" ];
+  };
 }

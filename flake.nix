@@ -20,28 +20,41 @@
         };
 
         craneLib = crane.lib.${system};
-        git-ce = craneLib.buildPackage {
+        commonArgs = {
           src = craneLib.cleanCargoSource (craneLib.path ./.);
-
-          buildInputs = [
-            pkgs.openssl
-            pkgs.pkgconfig
+          buildInputs = with pkgs; [
+            openssl
+            pkgconfig
             # Add additional build inputs here
-          ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+          ] ++ lib.optionals stdenv.isDarwin [
             # Additional darwin specific inputs can be set here
-            pkgs.libiconv
+            libiconv
           ];
 
-          # Additional environment variables can be set directly
-          # MY_CUSTOM_VAR = "some value";
         };
+
+        cargoArtifacts = craneLib.buildDepsOnly (commonArgs // {
+          pname = "git-ce-deps";
+        });
+
+        git-ce-clippy = craneLib.cargoClippy (commonArgs // {
+          inherit cargoArtifacts;
+          cargoClippyExtraArgs = "--all-targets -- --deny warnings";
+        });
+
+        git-ce = craneLib.buildPackage (commonArgs // {
+          inherit cargoArtifacts;
+        });
+
       in
       {
         checks = {
-          inherit git-ce;
+          inherit
+            git-ce
+            git-ce-clippy;
         };
 
-        packages.default = git-ce;
+        packages. default = git-ce;
 
         apps.default = flake-utils.lib.mkApp {
           drv = git-ce;

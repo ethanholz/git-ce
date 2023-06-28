@@ -63,15 +63,14 @@ fn has_staged_changes() -> Result<bool, git2::Error> {
         .include_ignored(false);
 
     let statuses = repo.statuses(Some(&mut opts))?;
-    for _entry in statuses.iter().filter(|e| {
+    let count = statuses.iter().find(|e| {
         e.status().is_index_new()
             || e.status().is_index_modified()
             || e.status().is_index_renamed()
             || e.status().is_index_typechange()
-    }) {
-        return Ok(true);
-    }
-    Ok(false)
+    });
+
+    Ok(count.is_some())
 }
 
 fn make_commit(message: &str) -> Result<(), git2::Error> {

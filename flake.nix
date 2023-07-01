@@ -25,6 +25,7 @@
           buildInputs = with pkgs; [
             openssl
             pkgconfig
+            libgit2
             # Add additional build inputs here
           ] ++ lib.optionals stdenv.isDarwin [
             # Additional darwin specific inputs can be set here
@@ -73,6 +74,7 @@
             rust-analyzer
             pkg-config
             openssl
+            libgit2
           ];
         };
       });

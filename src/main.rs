@@ -1,9 +1,7 @@
-use std::{
-    io,
-    process::{exit, Command, Stdio},
-};
+use std::{io, process::Command};
 
-use dialoguer::{Editor, FuzzySelect, Input};
+use console::Term;
+use dialoguer::{FuzzySelect, Input};
 use git2::{Repository, StatusOptions};
 
 fn main() {
@@ -26,13 +24,22 @@ fn main() {
     let selections = &[
         "feat", "fix", "chore", "ci", "docs", "style", "refactor", "perf", "test",
     ];
+    let term = Term::stdout();
+
     let commit_types = FuzzySelect::new()
-        .with_prompt("Pick your favorite flavor")
+        .with_prompt("Select a commit type")
         .default(0)
         .items(&selections[..])
-        .interact()
+        .interact_opt()
         .unwrap();
+    let commit_types = match commit_types {
+        Some(commit_types) => commit_types,
+        None => return,
+    };
+
     println!("Selected {}", selections[commit_types]);
+    term.clear_last_lines(2).unwrap();
+    term.flush().unwrap();
 
     let breaking: String = Input::new()
         .with_prompt("Breaking changes")
@@ -42,13 +49,14 @@ fn main() {
     if !breaking.is_empty() {
         breaking_item = "!";
     }
+    term.clear_last_lines(1).unwrap();
+    term.flush().unwrap();
 
-    let msg: String = Input::new()
-        .with_prompt("Commit message")
-        .interact()
-        .unwrap();
+    let msg_str = format!("{}{}", selections[commit_types], breaking_item);
 
-    let mut built: String = format!("{}{}: {}", selections[commit_types], breaking_item, msg);
+    let msg: String = Input::new().with_prompt(&msg_str).interact().unwrap();
+
+    let mut built: String = format!("{}: {}", &msg_str, msg);
     if !breaking.is_empty() {
         built.push_str(&format!("\n\nBREAKING CHANGE: {}", breaking));
     }

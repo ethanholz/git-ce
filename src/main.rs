@@ -1,4 +1,4 @@
-use std::{io, process::Command};
+use std::{fmt, io, process::Command};
 
 use clap::Parser;
 use console::Term;
@@ -8,6 +8,26 @@ use git2::{Repository, StatusOptions};
 #[derive(Parser, Debug)]
 #[command(version)]
 struct Args {}
+
+#[derive(Default)]
+struct Commit {
+    commit_type: String,
+    message: String,
+    breaking: Option<String>,
+}
+
+impl fmt::Display for Commit {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.breaking {
+            Some(breaking) => write!(
+                f,
+                "{}!: {}\n\nBREAKING CHANGE: {}",
+                self.commit_type, self.message, breaking
+            ),
+            None => write!(f, "{}: {}", self.commit_type, self.message),
+        }
+    }
+}
 
 fn main() {
     let _args = Args::parse();
@@ -26,11 +46,11 @@ fn main() {
         Err(err) => panic!("Error: {}", err),
     }
 
-    let mut breaking_item = "";
     let selections = &[
         "feat", "fix", "chore", "ci", "docs", "style", "refactor", "perf", "test",
     ];
     let term = Term::stdout();
+    let mut commit = Commit::default();
 
     let commit_types = FuzzySelect::new()
         .with_prompt("Select a commit type")
@@ -38,34 +58,34 @@ fn main() {
         .items(&selections[..])
         .interact_opt()
         .unwrap();
-    let commit_types = match commit_types {
-        Some(commit_types) => commit_types,
+    match commit_types {
+        Some(commit_types) => commit.commit_type = selections[commit_types].to_string(),
         None => return,
     };
 
-    println!("Selected {}", selections[commit_types]);
     term.clear_last_lines(2).unwrap();
     term.flush().unwrap();
 
-    let breaking: String = Input::new()
+    let bc: String = Input::new()
         .with_prompt("Breaking changes")
         .default("".to_string())
         .interact()
         .unwrap();
-    if !breaking.is_empty() {
-        breaking_item = "!";
+    if bc != "" {
+        commit.breaking = Some(bc)
+    } else {
+        commit.breaking = None
     }
+
     term.clear_last_lines(1).unwrap();
     term.flush().unwrap();
 
-    let msg_str = format!("{}{}", selections[commit_types], breaking_item);
+    let msg_str = format!("{}", commit.commit_type);
 
-    let msg: String = Input::new().with_prompt(&msg_str).interact().unwrap();
+    commit.message = Input::new().with_prompt(&msg_str).interact().unwrap();
+    let built: String = format!("{}", commit);
+    print!("{}", built);
 
-    let mut built: String = format!("{}: {}", &msg_str, msg);
-    if !breaking.is_empty() {
-        built.push_str(&format!("\n\nBREAKING CHANGE: {}", breaking));
-    }
     let _ = make_commit_shell(&built);
 }
 
@@ -91,4 +111,30 @@ fn has_staged_changes() -> Result<bool, git2::Error> {
 fn make_commit_shell(message: &str) -> Result<std::process::ExitStatus, io::Error> {
     let args = vec!["commit", "-m", message, "-e"];
     Command::new("git").args(args).status()
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_print_commit() {
+        let commit = super::Commit {
+            commit_type: "feat".to_string(),
+            message: "test".to_string(),
+            breaking: None,
+        };
+        assert_eq!("feat: test", format!("{}", commit));
+    }
+
+    #[test]
+    fn test_print_commit_breaking() {
+        let commit = super::Commit {
+            commit_type: "feat".to_string(),
+            message: "test".to_string(),
+            breaking: Some("breaking".to_string()),
+        };
+        assert_eq!(
+            "feat!: test\n\nBREAKING CHANGE: breaking",
+            format!("{}", commit)
+        );
+    }
 }

@@ -1,10 +1,16 @@
 use std::{io, process::Command};
 
+use clap::Parser;
 use console::Term;
 use dialoguer::{FuzzySelect, Input};
 use git2::{Repository, StatusOptions};
 
+#[derive(Parser, Debug)]
+#[command(version)]
+struct Args {}
+
 fn main() {
+    let _args = Args::parse();
     if Repository::open(".").is_err() {
         println!("Not a git repo!");
         return;

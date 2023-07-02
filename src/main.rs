@@ -71,7 +71,7 @@ fn main() {
         .default("".to_string())
         .interact()
         .unwrap();
-    if bc != "" {
+    if bc.is_empty() {
         commit.breaking = Some(bc)
     } else {
         commit.breaking = None
@@ -80,9 +80,10 @@ fn main() {
     term.clear_last_lines(1).unwrap();
     term.flush().unwrap();
 
-    let msg_str = format!("{}", commit.commit_type);
-
-    commit.message = Input::new().with_prompt(&msg_str).interact().unwrap();
+    commit.message = Input::new()
+        .with_prompt(&commit.commit_type)
+        .interact()
+        .unwrap();
     let built: String = format!("{}", commit);
     print!("{}", built);
 
@@ -115,6 +116,7 @@ fn make_commit_shell(message: &str) -> Result<std::process::ExitStatus, io::Erro
 
 #[cfg(test)]
 mod tests {
+
     #[test]
     fn test_print_commit() {
         let commit = super::Commit {

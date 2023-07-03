@@ -86,6 +86,8 @@ fn main() {
         .unwrap();
     let built: String = format!("{}", commit);
     print!("{}", built);
+    term.clear_last_lines(1).unwrap();
+    term.flush().unwrap();
 
     let _ = make_commit_shell(&built);
 }

@@ -1,6 +1,6 @@
 [package]
 name = "git-ce"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "0BSD"
 
@@ -9,5 +9,6 @@ license = "0BSD"
 [dependencies]
 clap = { version = "4.3.10", features = ["derive"] }
 console = "0.15.7"
+ctrlc = { version = "3.4.0", features = ["termination"] }
 dialoguer = { version = "0.10.4", features = ["fuzzy-select"] }
 git2 = "0.17.2"

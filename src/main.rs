@@ -52,38 +52,54 @@ fn main() {
     let term = Term::stdout();
     let mut commit = Commit::default();
 
-    let commit_types = FuzzySelect::new()
+    let _ = ctrlc::set_handler(move || {
+        let term = Term::stdout();
+        let _ = term.show_cursor();
+        term.clear_to_end_of_screen().unwrap();
+        term.flush().unwrap();
+    });
+
+    let commit_types_result = FuzzySelect::new()
         .with_prompt("Select a commit type")
         .default(0)
         .items(&selections[..])
-        .interact_opt()
-        .unwrap();
-    match commit_types {
-        Some(commit_types) => commit.commit_type = selections[commit_types].to_string(),
-        None => return,
+        .interact_on_opt(&term);
+    match commit_types_result {
+        Ok(commit_types) => {
+            match commit_types {
+                Some(commit_types) => commit.commit_type = selections[commit_types].to_string(),
+                None => return,
+            };
+        }
+        Err(_) => return,
     };
 
     term.clear_last_lines(2).unwrap();
     term.flush().unwrap();
 
-    let bc: String = Input::new()
+    let bc_result = Input::new()
         .with_prompt("Breaking changes")
         .default("".to_string())
-        .interact()
-        .unwrap();
-    if !bc.is_empty() {
-        commit.breaking = Some(bc)
-    } else {
-        commit.breaking = None
-    }
+        .interact_text();
+    match bc_result {
+        Ok(bc) => {
+            commit.breaking = if bc.is_empty() { None } else { Some(bc) };
+        }
+
+        Err(_) => return,
+    };
 
     term.clear_last_lines(1).unwrap();
     term.flush().unwrap();
 
-    commit.message = Input::new()
+    let message_result = Input::new()
         .with_prompt(&commit.commit_type)
-        .interact()
-        .unwrap();
+        .interact_text();
+
+    match message_result {
+        Ok(message) => commit.message = message,
+        Err(_) => return,
+    }
     let built: String = format!("{}", commit);
     print!("{}", built);
     term.clear_last_lines(1).unwrap();

@@ -71,7 +71,7 @@ fn main() {
         .default("".to_string())
         .interact()
         .unwrap();
-    if bc.is_empty() {
+    if !bc.is_empty() {
         commit.breaking = Some(bc)
     } else {
         commit.breaking = None

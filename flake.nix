@@ -43,6 +43,11 @@
           cargoClippyExtraArgs = "--all-targets -- --deny warnings";
         });
 
+        git-ce-nextest = craneLib.cargoNextest (commonArgs // {
+          inherit cargoArtifacts;
+        });
+
+
         git-ce = craneLib.buildPackage (commonArgs // {
           inherit cargoArtifacts;
         });
@@ -52,7 +57,8 @@
         checks = {
           inherit
             git-ce
-            git-ce-clippy;
+            git-ce-clippy
+            git-ce-nextest;
         };
 
         packages. default = git-ce;

@@ -81,6 +81,7 @@
             pkg-config
             openssl
             libgit2
+            git-cliff
           ];
         };
       });

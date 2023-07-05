@@ -67,6 +67,8 @@
           drv = git-ce;
         };
 
+        herculesCI = { };
+
         devShells.default = pkgs.mkShell {
           inputsFrom = builtins.attrValues self.checks.${system};
 

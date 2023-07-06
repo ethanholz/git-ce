@@ -23,8 +23,8 @@
       hercules-ci.flake-update = {
         enable = true;
         when = {
-          hour = [ 23 ];
-          dayofWeek = [ "Fri" ];
+          hour = [ 12 ];
+          dayofWeek = [ "Thur" "Fri" ];
         };
       };
       perSystem = { self, pkgs, system, ... }:

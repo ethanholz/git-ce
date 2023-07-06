@@ -14,7 +14,7 @@
     hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects";
   };
 
-  outputs = inputs@{ flake-parts, nixpkgs, crane, flake-utils, ... }:
+  outputs = inputs@{ self, flake-parts, nixpkgs, crane, flake-utils, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
       imports = [
@@ -27,7 +27,7 @@
           dayofWeek = [ "Thur" "Fri" ];
         };
       };
-      perSystem = { self, pkgs, system, ... }:
+      perSystem = { pkgs, system, ... }:
         let
           pkgs = import nixpkgs {
             inherit system;
@@ -78,8 +78,8 @@
           };
 
 
+
           devShells.default = pkgs.mkShell {
-            inputsFrom = builtins.attrValues self.checks.${system};
 
             # Additional dev-shell environment variables can be set directly
             # MY_CUSTOM_DEVELOPMENT_VAR = "something else";

@@ -1,5 +1,5 @@
 {
-  description = "A flake for git-ce";
+  description = "A flake for git-ce, with Hercules CI support";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

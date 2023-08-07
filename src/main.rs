@@ -30,13 +30,18 @@ impl fmt::Display for Commit {
 }
 
 fn main() {
+    let cwd = std::env::current_dir().unwrap();
+    let cwd = cwd.to_str().unwrap();
     let _args = Args::parse();
-    if Repository::open(".").is_err() {
-        println!("Not a git repo!");
-        return;
-    }
+    let repo = match Repository::discover(cwd) {
+        Ok(repo) => repo,
+        Err(_err) => {
+            println!("Not a git repo!");
+            return;
+        }
+    };
 
-    match has_staged_changes() {
+    match has_staged_changes(repo) {
         Ok(val) => {
             if !val {
                 println!("No staged changes!");
@@ -108,8 +113,7 @@ fn main() {
     let _ = make_commit_shell(&built);
 }
 
-fn has_staged_changes() -> Result<bool, git2::Error> {
-    let repo = Repository::open(".")?;
+fn has_staged_changes(repo: Repository) -> Result<bool, git2::Error> {
     let mut opts = StatusOptions::new();
     opts.include_untracked(false)
         .renames_head_to_index(true)

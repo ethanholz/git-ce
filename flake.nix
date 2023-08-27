@@ -25,6 +25,7 @@
           hour = [ 7 ];
           dayOfWeek = [ "Sat" ];
         };
+        autoMergeMethod = "rebase";
       };
       systems = [ "x86_64-linux" ];
       perSystem = { pkgs, system, ... }:

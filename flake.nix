@@ -38,7 +38,7 @@
             src = craneLib.cleanCargoSource (craneLib.path ./.);
             buildInputs = with pkgs; [
               openssl
-              pkgconfig
+              pkg-config
               libgit2
               # Add additional build inputs here
             ] ++ lib.optionals stdenv.isDarwin [

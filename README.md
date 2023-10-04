@@ -3,5 +3,5 @@
 A simple CLI for working with conventional commits.
 
 ## TODO
-- [ ] Add scoping
+- [x] Add scoping
 - [ ] Add git config support for scopes and custom types

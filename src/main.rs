@@ -79,6 +79,19 @@ fn main() {
         Err(_) => return,
     };
 
+    let scope = Input::new()
+        .with_prompt("Scope")
+        .default("".to_string())
+        .interact_text();
+    match scope {
+        Ok(scope) => {
+            if !scope.is_empty() {
+                commit.commit_type = format!("{}({})", commit.commit_type, scope);
+            }
+        }
+        Err(_) => return,
+    };
+
     term.clear_last_lines(2).unwrap();
     term.flush().unwrap();
 

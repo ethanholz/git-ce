@@ -78,6 +78,8 @@ fn main() {
         }
         Err(_) => return,
     };
+    term.clear_last_lines(2).unwrap();
+    term.flush().unwrap();
 
     let scope = Input::new()
         .with_prompt("Scope")
@@ -91,8 +93,7 @@ fn main() {
         }
         Err(_) => return,
     };
-
-    term.clear_last_lines(2).unwrap();
+    term.clear_last_lines(1).unwrap();
     term.flush().unwrap();
 
     let bc_result = Input::new()

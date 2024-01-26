@@ -17,7 +17,7 @@ jobs:
       uses: DeterminateSystems/nix-installer-action@main
 
     - name: Setup Magic Cache
-      uses: DeterminateSystems/magic-cache-action@main
+      uses: DeterminateSystems/magic-nix-cache-action@main
 
     - name: Authenticate with Cachix
       uses: cachix/cachix-action@v12

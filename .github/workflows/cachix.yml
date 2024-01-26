@@ -14,8 +14,10 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install nix
-      uses: cachix/install-nix-action@v22
+      uses: DeterminateSystems/nix-installer-action@main
 
+    - name: Setup Magic Cache
+      uses: DeterminateSystems/magic-cache-action@main
 
     - name: Authenticate with Cachix
       uses: cachix/cachix-action@v12

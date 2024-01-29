@@ -16,3 +16,8 @@ jobs:
         uses: DeterminateSystems/update-flake-lock@main
         with:
           token: ${{ secrets.GH_UPDATE_TOKEN }}
+          git-author-name: Github Action
+          git-author-email: action@github.com
+          git-committer-name: Github Action
+          git-commiter-email: action@github.com
+ 

@@ -11,4 +11,4 @@ clap = { version = "4.3.10", features = ["derive"] }
 console = "0.15.7"
 ctrlc = { version = "3.4.0", features = ["termination"] }
 dialoguer = { version = "0.10.4", features = ["fuzzy-select"] }
-git2 = "0.17.2"
+git2 = "0.18.2"

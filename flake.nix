@@ -11,22 +11,10 @@
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    hercules-ci-effects.url = "github:hercules-ci/hercules-ci-effects";
   };
 
   outputs = inputs@{ self, flake-parts, nixpkgs, crane, flake-utils, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [
-        inputs.hercules-ci-effects.flakeModule
-      ];
-      hercules-ci.flake-update = {
-        enable = true;
-        when = {
-          hour = [ 7 ];
-          dayOfWeek = [ "Sat" ];
-        };
-        autoMergeMethod = "rebase";
-      };
       systems = [ "x86_64-linux" ];
       perSystem = { pkgs, system, ... }:
         let

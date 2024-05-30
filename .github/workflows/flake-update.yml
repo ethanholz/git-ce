@@ -19,5 +19,5 @@ jobs:
           git-author-name: Github Action
           git-author-email: action@github.com
           git-committer-name: Github Action
-          git-commiter-email: action@github.com
+          git-committer-email: action@github.com
  

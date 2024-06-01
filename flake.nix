@@ -21,7 +21,7 @@
           pkgs = import nixpkgs {
             inherit system;
           };
-          craneLib = crane.lib.${system};
+          craneLib = crane.mkLib pkgs;
           commonArgs = {
             src = craneLib.cleanCargoSource (craneLib.path ./.);
             buildInputs = with pkgs; [

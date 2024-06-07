@@ -32,7 +32,7 @@ impl fmt::Display for Commit {
 fn main() {
     let cwd = std::env::current_dir().unwrap();
     let cwd = cwd.to_str().unwrap();
-    let _args = Args::parse();
+    // let _args = Args::parse();
     let repo = match Repository::discover(cwd) {
         Ok(repo) => repo,
         Err(_err) => {
@@ -40,8 +40,16 @@ fn main() {
             return;
         }
     };
+    let config = repo.config().unwrap();
+    let scopes = config.multivar("ce.scope", None).unwrap();
+    let mut parsed_scopes = vec!["".to_string()];
+    let _ = scopes.for_each(|e| {
+        if let Some(value) = e.value() {
+            parsed_scopes.push(value.to_string());
+        }
+    });
 
-    match has_staged_changes(repo) {
+    match has_staged_changes(&repo) {
         Ok(val) => {
             if !val {
                 println!("No staged changes!");
@@ -50,7 +58,7 @@ fn main() {
         }
         Err(err) => panic!("Error: {}", err),
     }
-
+    //
     let selections = &[
         "feat", "fix", "chore", "ci", "docs", "style", "refactor", "perf", "test",
     ];
@@ -78,23 +86,45 @@ fn main() {
         }
         Err(_) => return,
     };
-    term.clear_last_lines(2).unwrap();
-    term.flush().unwrap();
-
-    let scope = Input::new()
-        .with_prompt("Scope")
-        .default("".to_string())
-        .interact_text();
-    match scope {
-        Ok(scope) => {
-            if !scope.is_empty() {
-                commit.commit_type = format!("{}({})", commit.commit_type, scope);
-            }
-        }
-        Err(_) => return,
-    };
     term.clear_last_lines(1).unwrap();
     term.flush().unwrap();
+
+    if parsed_scopes.len() == 1 {
+        let scope = Input::new()
+            .with_prompt("Scope")
+            .default("".to_string())
+            .interact_text();
+        match scope {
+            Ok(scope) => {
+                if !scope.is_empty() {
+                    commit.commit_type = format!("{}({})", commit.commit_type, scope);
+                }
+            }
+            Err(_) => return,
+        };
+        term.clear_last_lines(1).unwrap();
+        term.flush().unwrap();
+    } else {
+        let scope = FuzzySelect::new()
+            .with_prompt("Scope")
+            .default(0)
+            .items(&parsed_scopes[..])
+            .interact_on_opt(&term);
+        match scope {
+            Ok(scope) => {
+                match scope {
+                    Some(scope) => {
+                        commit.commit_type =
+                            format!("{}({})", commit.commit_type, parsed_scopes[scope]);
+                    }
+                    None => return,
+                };
+            }
+            Err(_) => return,
+        };
+        term.clear_last_lines(1).unwrap();
+        term.flush().unwrap();
+    }
 
     let bc_result = Input::new()
         .with_prompt("Breaking changes")
@@ -127,7 +157,7 @@ fn main() {
     let _ = make_commit_shell(&built);
 }
 
-fn has_staged_changes(repo: Repository) -> Result<bool, git2::Error> {
+fn has_staged_changes(repo: &Repository) -> Result<bool, git2::Error> {
     let mut opts = StatusOptions::new();
     opts.include_untracked(false)
         .renames_head_to_index(true)

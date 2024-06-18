@@ -1,13 +1,9 @@
 use std::{fmt, io, process::Command};
 
-use clap::Parser;
+use clap::command;
 use console::Term;
 use dialoguer::{FuzzySelect, Input};
 use git2::{Repository, StatusOptions};
-
-#[derive(Parser, Debug)]
-#[command(version)]
-struct Args {}
 
 #[derive(Default)]
 struct Commit {
@@ -32,7 +28,7 @@ impl fmt::Display for Commit {
 fn main() {
     let cwd = std::env::current_dir().unwrap();
     let cwd = cwd.to_str().unwrap();
-    // let _args = Args::parse();
+    let _ = command!().get_matches();
     let repo = match Repository::discover(cwd) {
         Ok(repo) => repo,
         Err(_err) => {

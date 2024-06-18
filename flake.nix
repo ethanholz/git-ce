@@ -25,7 +25,6 @@
           commonArgs = {
             src = craneLib.cleanCargoSource (craneLib.path ./.);
             buildInputs = with pkgs; [
-              openssl
               pkg-config
               libgit2
               # Add additional build inputs here
@@ -66,24 +65,17 @@
             drv = git-ce;
           };
 
-
-
-          devShells.default = pkgs.mkShell {
-
-            # Additional dev-shell environment variables can be set directly
-            # MY_CUSTOM_DEVELOPMENT_VAR = "something else";
-
-            # Extra inputs can be added here
-            nativeBuildInputs = with pkgs; [
-              cargo
-              rustc
-              rust-analyzer
-              pkg-config
-              openssl
-              libgit2
-              git-cliff
+          devShells.default = craneLib.devShell {
+            checks = self.checks.${system};
+            packages = with pkgs; [
+                rust-analyzer
+                libgit2
+                git-cliff
             ];
           };
+
+
+
         };
 
     };

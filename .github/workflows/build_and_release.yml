@@ -39,6 +39,9 @@ jobs:
       - name: Install cargo-zigbuild
         run: pip install cargo-zigbuild
 
+      - name: Install zig
+        uses: goto-bus-stop/setup-zig@v2
+
       - name: Build project for universal2-apple-darwin
         run: just build universal2-apple-darwin
 

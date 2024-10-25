@@ -3,12 +3,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
-    name: Build Binaries
+    name: Build Linux Binaries
     strategy:
       matrix:
-        target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl, universal2-apple-darwin]
+        target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl]
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -26,6 +26,27 @@ jobs:
         with:
           name: "${{ matrix.target }}-git-ce"
           path: target/${{ matrix.target }}/release/git-ce
+          retention-days: 7
+  build-mac:
+    runs-on: macos-latest
+    name: Build macOS binaries
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/setup-python@v5
+      - uses: extractions/setup-just@v2
+
+      - name: Install cargo-zigbuild
+        run: pip install cargo-zigbuild
+
+      - name: Build project for universal2-apple-darwin
+        run: just build universal2-apple-darwin
+
+      - name: Upload artifact for universal2-apple-darwin
+        uses: actions/upload-artifact@v4
+        with:
+          name: "universal2-apple-darwin-git-ce"
+          path: target/universal2-apple-darwin/release/git-ce
           retention-days: 7
 
 

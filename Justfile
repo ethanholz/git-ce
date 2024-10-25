@@ -1,9 +1,20 @@
 build target:
-    @echo 'Building target: {{target}}...'
     cargo zigbuild --target {{target}} --release -v
-build-universal-mac-release:
-    just build "universal2-apple-darwin"
-build-x86_64-linux-release:
-    just build "x86_64-unknown-linux-musl"
-build-aarch64-linux-release:
-    just build "aarch64-unknown-linux-musl"
+
+release target:
+    mkdir -p release
+    cp target/{{target}}/release/git-ce release/git-ce-{{target}} 
+
+build-and-release target:
+    just build target={{target}}
+    just release target={{target}}
+
+build-and-release-all:
+    just build-and-release "universal2-apple-darwin"
+    just build-and-release "x86_64-unknown-linux-musl"
+    just build-and-release "aarch64-unknown-linux-musl"
+
+pre-release:
+    cargo check --release --locked --all-targets
+
+

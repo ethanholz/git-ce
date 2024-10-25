@@ -1,0 +1,34 @@
+name: Build and Release Binaries
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build Binaries
+    strategy:
+      matrix:
+        target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl, universal2-apple-darwin]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/setup-python@v5
+      - uses: extractions/setup-just@v2
+
+      - name: Install cargo-zigbuild
+        run: pip install cargo-zigbuild
+
+      - name: Build project for ${{ matrix.target }}
+        run: just build ${{ matrix.target }}
+
+      - name: Upload artifact for ${{ matrix.target }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.target }}-git-ce"
+          path: target/${{ matrix.target }}/release/git-ce
+          retention-days: 7
+
+
+
+
+

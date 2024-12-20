@@ -191,7 +191,7 @@ dependencies = [
 
 [[package]]
 name = "git-ce"
-version = "0.3.6"
+version = "0.3.7"
 dependencies = [
  "clap",
  "console",

@@ -178,10 +178,14 @@ fn make_commit_shell(message: &str) -> Result<std::process::ExitStatus, io::Erro
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use io::Write;
+    use std::path::Path;
+    use tempfile::tempdir;
 
     #[test]
     fn test_print_commit() {
-        let commit = super::Commit {
+        let commit = Commit {
             commit_type: "feat".to_string(),
             message: "test".to_string(),
             breaking: None,
@@ -191,7 +195,7 @@ mod tests {
 
     #[test]
     fn test_print_commit_breaking() {
-        let commit = super::Commit {
+        let commit = Commit {
             commit_type: "feat".to_string(),
             message: "test".to_string(),
             breaking: Some("breaking".to_string()),
@@ -200,5 +204,25 @@ mod tests {
             "feat!: test\n\nBREAKING CHANGE: breaking",
             format!("{}", commit)
         );
+    }
+
+    #[test]
+    fn test_has_staged_changes() {
+        let temp = tempdir().unwrap();
+        std::env::set_current_dir(&temp).unwrap();
+
+        // Create a git repo
+        let repo = Repository::init(&temp).unwrap();
+        assert!(!has_staged_changes(&repo).unwrap());
+        // Create a file
+        let file_path = temp.path().join("test.txt");
+        let mut file = std::fs::File::create(&file_path).unwrap();
+        file.write_all(b"Hello").unwrap();
+
+        // Add the file
+        let mut index = repo.index().unwrap();
+        index.add_path(Path::new("test.txt")).unwrap();
+
+        assert!(has_staged_changes(&repo).unwrap());
     }
 }

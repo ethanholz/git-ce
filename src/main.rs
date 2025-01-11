@@ -1,5 +1,6 @@
 use std::{fmt, io, process::Command};
 
+use clap::command;
 use git2::{Repository, StatusOptions};
 use inquire::{Select, Text};
 
@@ -32,7 +33,7 @@ impl fmt::Display for Commit {
 fn main() {
     let cwd = std::env::current_dir().unwrap();
     let cwd = cwd.to_str().unwrap();
-    // let _ = command!().get_matches();
+    let _ = command!().get_matches();
     let repo = match Repository::discover(cwd) {
         Ok(repo) => repo,
         Err(_err) => {

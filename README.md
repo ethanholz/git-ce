@@ -10,7 +10,8 @@ Once installed, all you have to do is run in a repo with added changes:
 git ce 
 ```
 
-## TODO
-- [x] Add scoping
-- [x] Add git config support for scopes and custom types
-- [ ] Add documentation for custom project scopes
+## Adding custom scopes
+We use the Git config to set scopes. To do this you would just run:
+```sh
+git config ce.flake <scope> --add
+```

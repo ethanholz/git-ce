@@ -1,8 +1,13 @@
 use std::{fmt, io, process::Command};
 
-use clap::command;
+use clap::{command, Parser};
 use git2::{Repository, StatusOptions};
 use inquire::{Select, Text};
+use rig::{
+    client::{CompletionClient, ProviderClient},
+    completion::Prompt,
+    providers::openai::{self, O3_MINI},
+};
 
 #[derive(Default)]
 struct Commit {
@@ -30,10 +35,46 @@ impl fmt::Display for Commit {
     }
 }
 
-fn main() {
+#[derive(Parser)]
+#[command(name = "git-ce")]
+#[command(about = "Conventional commit helper")]
+#[command(version = env!("CARGO_PKG_VERSION"))] // Uses version from Cargo.toml
+struct Cli {
+    /// Output git diff and status for LLM processing
+    #[arg(long)]
+    llm: bool,
+}
+
+fn get_commit_info(repo: &Repository) -> Result<String, git2::Error> {
+    let mut output = String::new();
+
+    // Get the staged diff (equivalent to git diff --cached)
+    let head = repo.head()?.peel_to_tree()?;
+    let index = repo.index()?;
+
+    let diff = repo.diff_tree_to_index(Some(&head), Some(&index), None)?;
+
+    // Collect the diff output
+    diff.print(git2::DiffFormat::Patch, |_delta, _hunk, line| {
+        match line.origin() {
+            '+' | '-' | ' ' => output.push_str(&format!(
+                "{}{}",
+                line.origin(),
+                std::str::from_utf8(line.content()).unwrap()
+            )),
+            _ => output.push_str(std::str::from_utf8(line.content()).unwrap()),
+        }
+        true
+    })?;
+
+    Ok(output)
+}
+
+#[tokio::main]
+async fn main() {
+    let cli = Cli::parse();
     let cwd = std::env::current_dir().unwrap();
     let cwd = cwd.to_str().unwrap();
-    let _ = command!().get_matches();
     let repo = match Repository::discover(cwd) {
         Ok(repo) => repo,
         Err(_err) => {
@@ -41,6 +82,18 @@ fn main() {
             return;
         }
     };
+    if cli.llm {
+        let info = get_commit_info(&repo).unwrap();
+        let prompt = format!(
+            "Write me a conventional commit message using the following: {}",
+            info
+        );
+        let openai_client = openai::Client::from_env();
+        let model = openai_client.agent(O3_MINI).build();
+        let response = model.prompt(prompt).await.expect("Failed to prompt");
+        make_commit_shell(&response).unwrap();
+        return;
+    }
     let config = repo.config().unwrap();
     let scopes = config.multivar("ce.scope", None).unwrap();
     let mut parsed_scopes = vec!["".to_string()];

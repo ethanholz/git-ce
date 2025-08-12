@@ -13,7 +13,7 @@ inquire = "0.7.5"
 rig-core = { version = "0.13.0", features = [
     "reqwest-rustls",
 ], default-features = false }
-tokio = { version = "1.45.1", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
 
 [dev-dependencies]
 tempfile = "3"

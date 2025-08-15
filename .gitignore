@@ -1,2 +1,6 @@
 /target
 result
+release*
+.DS_Store
+.intentionally-empty-file.o
+.env

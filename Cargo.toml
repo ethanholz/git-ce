@@ -10,7 +10,7 @@ license = "MIT"
 git2 = { version = "0.20.2", default-features = false }
 clap = { version = "4.5", features = ["cargo", "derive"] }
 inquire = "0.7.5"
-rig-core = { version = "0.17.0", features = [
+rig-core = { version = "0.18.2", features = [
     "reqwest-rustls",
 ], default-features = false }
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread"] }
